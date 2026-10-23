@@ -31,7 +31,7 @@ window.TARGUS_POWERUP_CONFIG = {
    */
   labelsByType: {
     "POST": { name: "POST", color: "orange" },
-    "VIDEO": { name: "VIDEOS", color: "blue" },
+    "VIDEO": { name: "VIDEO", color: "blue" },
     "STORYS": { name: "STORYS", color: "purple" },
     "SITE": { name: "SITE", color: "green" },
     "BLOG": { name: "BLOG", color: "yellow" },
