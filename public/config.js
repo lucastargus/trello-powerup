@@ -12,8 +12,8 @@ window.TARGUS_POWERUP_CONFIG = {
   boards: {
     instagram: {
       name: "Quadro Instagram",
-      id: "PvAjE6xi",
-      allowedLists: ["POST", "VIDEO", "STORYS"]
+      id: "b9cqwmcO",
+      allowedLists: ["INSTAGRAM"]
     },
     prospeccao: {
       name: "Quadro Prospecção",
