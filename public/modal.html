@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Criar cards | Targus</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="page-header">
+      <div class="brand-mark">T</div>
+      <div>
+        <h1>Criar cards</h1>
+        <p>Geração de cronogramas e disparos de WhatsApp no Trello.</p>
+      </div>
+    </header>
+
+    <section id="setupNotice" class="notice notice-warning hidden"></section>
+
+    <section id="authPanel" class="panel hidden">
+      <h2>Conectar ao Trello</h2>
+      <p>Na primeira utilização, autorize o Power-Up a consultar listas e etiquetas e criar cards em seu nome.</p>
+      <button id="connectButton" class="button button-primary" type="button">Conectar ao Trello</button>
+      <p id="authError" class="error-text"></p>
+    </section>
+
+    <section id="mainPanel" class="hidden">
+      <nav class="tabs" aria-label="Tipo de geração">
+        <button class="tab-button active" data-tab="content" type="button">Cronograma de conteúdo</button>
+        <button class="tab-button" data-tab="whatsapp" type="button">Disparo WhatsApp</button>
+      </nav>
+
+      <section id="contentTab" class="panel tab-panel">
+        <h2>1. Definir destino e tipo</h2>
+        <div class="form-grid">
+          <label>Área / quadro de destino
+            <select id="contentArea" required>
+              <option value="instagram">Instagram</option>
+              <option value="prospeccao">Prospecção</option>
+            </select>
+          </label>
+          <label>Tipo de card / etiqueta
+            <select id="contentType" required></select>
+          </label>
+          <label>Lista de destino no Trello
+            <select id="contentList" required></select>
+          </label>
+          <label>Responsável (opcional)
+            <select id="contentMember"><option value="">Sem responsável</option></select>
+          </label>
+        </div>
+        <p class="helper">O tipo selecionado define a etiqueta. A lista de destino começa com a lista de mesmo nome; você pode alterá-la se necessário.</p>
+
+        <h2>2. Datas e temas</h2>
+        <p class="helper">Preencha até 4 cards. Informe a data planejada de publicação; o prazo do card será definido automaticamente para 3 dias antes, às 9h.</p>
+        <div id="contentRows" class="date-rows"></div>
+        <div class="action-row">
+          <span id="contentCount" class="helper">0 cards prontos</span>
+          <button id="generateContentButton" class="button button-primary" type="button">Gerar cards de conteúdo</button>
+        </div>
+        <div id="contentResult" class="result-box hidden" aria-live="polite"></div>
+      </section>
+
+      <section id="whatsappTab" class="panel tab-panel hidden">
+        <h2>Disparo WhatsApp</h2>
+        <p class="helper">Cole um número por linha. O sistema cria um card para cada pessoa/dia útil, com até 5 contatos no checklist, responsável atribuído e etiqueta PROSPECÇÃO ATIVA.</p>
+        <div class="form-grid">
+          <label>Quadro de destino
+            <select id="waArea" disabled>
+              <option value="prospeccao">Prospecção</option>
+            </select>
+          </label>
+          <label>Lista de destino
+            <select id="waList"></select>
+          </label>
+          <label>Primeiro dia do rodízio
+            <input id="waStartDate" type="date" required>
+          </label>
+          <label>Primeira pessoa do rodízio
+            <select id="waFirstMember" required></select>
+          </label>
+        </div>
+        <label class="block-label">Pessoas que participarão do rodízio
+          <select id="waMembers" class="member-select" multiple size="7" aria-describedby="memberHelp"></select>
+        </label>
+        <p id="memberHelp" class="helper">Por padrão, todos os membros do quadro selecionado ficam marcados. A ordem é alfabética e começa pela pessoa escolhida acima.</p>
+        <label class="block-label">Números de WhatsApp (um por linha)
+          <textarea id="waNumbers" rows="9" placeholder="81999999999&#10;81111111111&#10;81888888888"></textarea>
+        </label>
+        <div id="waPreview" class="helper">0 números válidos · 0 cards previstos</div>
+        <div class="action-row">
+          <span class="helper">5 números por card · sábados e domingos são pulados</span>
+          <button id="generateWhatsappButton" class="button button-primary" type="button">Gerar cards de disparo</button>
+        </div>
+        <div id="whatsappResult" class="result-box hidden" aria-live="polite"></div>
+      </section>
+    </section>
+    <footer>Projeto interno Targus · Confirme o quadro/listas e teste com poucos cards antes de usar na equipe.</footer>
+  </main>
+
+  <script src="https://p.trellocdn.com/power-up.min.js"></script>
+  <script src="./config.js"></script>
+  <script src="./modal.js"></script>
+</body>
+</html>
