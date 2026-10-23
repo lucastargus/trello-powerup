@@ -12,8 +12,8 @@ window.TARGUS_POWERUP_CONFIG = {
   boards: {
     instagram: {
       name: "Quadro Instagram",
-      id: "b9cqwmcO",
-      allowedLists: ["INSTAGRAM"]
+      id: "jNVT749D",
+      allowedLists: ["POST", "VIDEO", "STORYS"]
     },
     prospeccao: {
       name: "Quadro Prospecção",
@@ -31,7 +31,7 @@ window.TARGUS_POWERUP_CONFIG = {
    */
   labelsByType: {
     "POST": { name: "POST", color: "orange" },
-    "VIDEO": { name: "VIDEO", color: "blue" },
+    "VIDEO": { name: "VIDEOS", color: "blue" },
     "STORYS": { name: "STORYS", color: "purple" },
     "SITE": { name: "SITE", color: "green" },
     "BLOG": { name: "BLOG", color: "yellow" },
