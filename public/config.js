@@ -7,7 +7,7 @@
  */
 window.TARGUS_POWERUP_CONFIG = {
   appName: "Targus | Cronogramas de Marketing",
-  appKey: "COLE_AQUI_A_CHAVE_API_DO_POWER_UP",
+  appKey: "56eadaecd87c7e114cfae18fca0c494b",
 
   boards: {
     instagram: {
