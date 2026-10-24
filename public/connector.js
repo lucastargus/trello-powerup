@@ -3,8 +3,9 @@
 
   const cfg = window.TARGUS_POWERUP_CONFIG;
   const absolute = (path) => new URL(path, window.location.href).href;
-  const iconLight = absolute("./assets/targus-icon-dark.svg");
-  const iconDark = absolute("./assets/targus-icon-light.svg");
+  // Ícone claro (logo preta) para tema claro; logo branca para tema escuro.
+  const iconLight = absolute("./assets/logo Black.png");
+  const iconDark = absolute("./assets/logo White.png");
 
   window.TrelloPowerUp.initialize({
     "board-buttons": function (t) {

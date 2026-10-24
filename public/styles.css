@@ -53,3 +53,4 @@ footer { margin: 16px 2px 0; color: var(--muted); font-size: 11px; }
   .action-row { align-items: stretch; flex-direction: column; }
   .button { width: 100%; }
 }
+.brand-logo { height: 44px; width: auto; max-width: 140px; object-fit: contain; }
