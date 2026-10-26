@@ -19,7 +19,8 @@
             title: "Targus | Criar cards",
             url: modalUrl,
             accentColor: "#ea4d33",
-            fullscreen: true
+            fullscreen: false,
+            size: "medium"
           });
         }
       }];

@@ -8,6 +8,8 @@
   let boardCache = null;
   let busy = false;
 
+  const CALENDAR_SVG = '<svg class="cal-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>';
+
   const norm = (s) => String(s || "")
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
     .trim().toLocaleUpperCase("pt-BR");
@@ -71,7 +73,7 @@
     return data;
   }
 
-  /* Usa o quadro em que o botão foi clicado (sem depender de IDs no config). */
+  /* Usa o quadro em que o botão foi clicado. */
   async function getCurrentBoardId() {
     const ctx = t.getContext();
     if (ctx && ctx.board) return ctx.board;
@@ -83,15 +85,12 @@
     if (!forceReload && boardCache) return boardCache;
     const boardId = await getCurrentBoardId();
     const id = encodeURIComponent(boardId);
-    const [lists, labels, members, board] = await Promise.all([
+    const [lists, labels, board] = await Promise.all([
       apiRequest("GET", `/boards/${id}/lists`, { filter: "open", fields: "id,name,closed" }),
       apiRequest("GET", `/boards/${id}/labels`, { fields: "id,name,color", limit: 1000 }),
-      apiRequest("GET", `/boards/${id}/members`, { fields: "id,fullName,username" }),
       apiRequest("GET", `/boards/${id}`, { fields: "id,name" })
     ]);
-    const sortedMembers = members.slice().sort((a, b) =>
-      (a.fullName || a.username || "").localeCompare(b.fullName || b.username || "", "pt-BR"));
-    boardCache = { boardId: board.id, boardName: board.name, lists, labels, members: sortedMembers };
+    boardCache = { boardId: board.id, boardName: board.name, lists, labels };
     return boardCache;
   }
 
@@ -105,39 +104,24 @@
     const box = $("#setupNotice");
     if (missing.length) {
       const names = data.lists.map(l => l.name).join(", ") || "nenhuma";
-      box.textContent = `ATENÇÃO: no quadro “${data.boardName}” não encontrei a(s) lista(s): ${missing.map(a => a.listName).join(", ")}. Listas existentes: ${names}. Você ainda pode escolher outra lista manualmente.`;
+      box.textContent = `ATENÇÃO: no quadro “${data.boardName}” não encontrei a(s) lista(s): ${missing.map(a => a.listName).join(", ")}. Listas existentes: ${names}. Ajuste o nome em config.js (listName).`;
       show(box, true);
     } else {
       show(box, false);
     }
   }
 
-  function fillSelect(select, items, getValue, getLabel, selectedValue) {
+  /* Tipos de card disponíveis dependem da área (ex.: STORYS só no Instagram). */
+  function fillTypes() {
+    const area = $("#contentArea").value;
+    const select = $("#contentType");
     select.innerHTML = "";
-    for (const item of items) {
+    for (const type of cfg.areas[area].types) {
       const option = document.createElement("option");
-      option.value = getValue(item);
-      option.textContent = getLabel(item);
-      if (selectedValue && option.value === selectedValue) option.selected = true;
+      option.value = type;
+      option.textContent = type;
       select.appendChild(option);
     }
-  }
-
-  function selectAreaList() {
-    if (!boardCache) return;
-    const match = findAreaList(boardCache, $("#contentArea").value);
-    if (match) $("#contentList").value = match.id;
-  }
-
-  async function refreshContentForm() {
-    const data = await getBoardData();
-    showListWarnings(data);
-    fillSelect($("#contentType"), cfg.cardTypes, x => x, x => x);
-    fillSelect($("#contentList"), data.lists, x => x.id, x => x.name,
-      (findAreaList(data, $("#contentArea").value) || {}).id);
-    const memberOptions = [{ id: "", fullName: "Sem responsável" }, ...data.members];
-    fillSelect($("#contentMember"), memberOptions, x => x.id, x => x.fullName || x.username || x.id, "");
-    updateContentCount();
   }
 
   function setupDateRows() {
@@ -147,15 +131,21 @@
       const row = document.createElement("div");
       row.className = "date-row";
       row.innerHTML = `
-        <label>Data planejada de publicação ${index}
-          <input type="date" class="publish-date" data-index="${index}" aria-label="Data planejada de publicação ${index}">
+        <label>Data da publicação ${index}
+          <span class="date-field">
+            ${CALENDAR_SVG}
+            <input type="date" class="publish-date" data-index="${index}" aria-label="Data da publicação ${index}">
+          </span>
         </label>
-        <label>Tema / título do card ${index} (opcional)
-          <input type="text" class="publish-title" data-index="${index}" maxlength="120" placeholder="Ex.: 3 erros que custam caro ao empresário">
+        <label>Tema / título (opcional)
+          <input type="text" class="publish-title" data-index="${index}" maxlength="120" placeholder="Ex.: 3 erros que custam caro">
         </label>`;
       container.appendChild(row);
     }
     container.querySelectorAll("input").forEach(input => input.addEventListener("input", updateContentCount));
+    container.querySelectorAll(".publish-date").forEach(input => input.addEventListener("click", () => {
+      try { input.showPicker(); } catch (e) { /* navegador sem showPicker */ }
+    }));
   }
 
   function updateContentCount() {
@@ -196,8 +186,8 @@
     return label;
   }
 
-  async function createCard(listId, name, description, dueDate) {
-    const params = { idList: listId, name, desc: description };
+  async function createCard(listId, name, dueDate) {
+    const params = { idList: listId, name };
     if (dueDate) params.due = dueDate;
     return apiRequest("POST", "/cards", params);
   }
@@ -205,11 +195,6 @@
   async function addLabelAfterCreation(cardId, labelId) {
     // Aplicar separadamente após criar o card para gerar o evento "etiqueta adicionada" (Butler).
     return apiRequest("POST", `/cards/${encodeURIComponent(cardId)}/idLabels`, { value: labelId });
-  }
-
-  async function addMember(cardId, memberId) {
-    if (!memberId) return;
-    return apiRequest("POST", `/cards/${encodeURIComponent(cardId)}/idMembers`, { value: memberId });
   }
 
   async function listCards(listId) {
@@ -222,8 +207,6 @@
     const resultBox = $("#contentResult");
     const area = $("#contentArea").value;
     const type = $("#contentType").value;
-    const listId = $("#contentList").value;
-    const memberId = $("#contentMember").value;
     const dateInputs = Array.from(document.querySelectorAll(".publish-date"));
     const titleInputs = Array.from(document.querySelectorAll(".publish-title"));
     const entries = dateInputs
@@ -231,7 +214,9 @@
       .filter(x => x.date);
 
     if (!entries.length) return result(resultBox, "Selecione pelo menos uma data de publicação.", "error");
-    if (!listId) return result(resultBox, "Não encontrei uma lista de destino. Confira se o quadro tem as listas INSTAGRAM e PROSPECCAO ou escolha outra lista.", "error");
+    if (!cfg.areas[area].types.includes(type)) {
+      return result(resultBox, `O tipo ${type} não pode ser criado na área ${cfg.areas[area].name}.`, "error");
+    }
     const duplicates = entries.map(x => x.date).filter((date, index, all) => all.indexOf(date) !== index);
     if (duplicates.length) return result(resultBox, "Há datas repetidas. Use uma data diferente para cada card.", "error");
 
@@ -243,14 +228,13 @@
     const failures = [];
     try {
       const data = await getBoardData();
-      if (!data.lists.some(x => x.id === listId)) {
-        throw new Error("A lista escolhida não pertence a este quadro. Reabra o Power-Up.");
+      const targetList = findAreaList(data, area);
+      if (!targetList) {
+        throw new Error(`não encontrei a lista “${cfg.areas[area].listName}” neste quadro.`);
       }
-      const areaName = cfg.areas[area].name;
       const label = await ensureLabel(type);
-      const existingCards = await listCards(listId);
+      const existingCards = await listCards(targetList.id);
       for (const entry of entries) {
-        const publishDate = parseDateLocal(entry.date);
         const name = entry.title
           ? `${type} — ${entry.title} — ${formatDate(entry.date)}`
           : `${type} — ${formatDate(entry.date)}`;
@@ -261,17 +245,8 @@
         try {
           const dueDay = addCalendarDays(entry.date, -cfg.publishLeadDays);
           const dueIso = atLocalHour(dueDay, cfg.contentDeadlineHour);
-          const desc = [
-            `Área: ${areaName}`,
-            `Tipo de card: ${type}`,
-            `Data planejada de publicação: ${formatDate(publishDate)}`,
-            `Prazo de preparação: ${formatDate(dueDay)} às ${String(cfg.contentDeadlineHour).padStart(2, "0")}:00`,
-            "",
-            "Observação: a checklist correspondente deve ser adicionada pela automação do Trello após a etiqueta ser aplicada."
-          ].join("\n");
-          const card = await createCard(listId, name, desc, dueIso);
+          const card = await createCard(targetList.id, name, dueIso);
           await addLabelAfterCreation(card.id, label.id);
-          await addMember(card.id, memberId);
           created++;
         } catch (error) {
           failures.push(`${name}: ${error.message}`);
@@ -280,7 +255,6 @@
       const lines = [`Cards criados: ${created}.`];
       if (skipped.length) lines.push(`Ignorados por duplicidade: ${skipped.length}\n- ${skipped.join("\n- ")}`);
       if (failures.length) lines.push(`Falhas: ${failures.length}\n- ${failures.join("\n- ")}`);
-      lines.push("\nConfira no Trello se a automação adicionou a checklist ao detectar a etiqueta.");
       result(resultBox, lines.join("\n"), failures.length ? "error" : "success");
     } catch (error) {
       result(resultBox, `Não foi possível gerar os cards: ${error.message}`, "error");
@@ -293,7 +267,9 @@
   async function loadMainPanel() {
     show($("#authPanel"), false);
     show($("#mainPanel"), true);
-    await refreshContentForm();
+    fillTypes();
+    updateContentCount();
+    showListWarnings(await getBoardData());
   }
 
   function connectAndLoad() {
@@ -324,9 +300,10 @@
 
   async function init() {
     setupDateRows();
+    fillTypes();
     checkConfig();
     $("#connectButton").addEventListener("click", connectAndLoad);
-    $("#contentArea").addEventListener("change", selectAreaList);
+    $("#contentArea").addEventListener("change", fillTypes);
     $("#generateContentButton").addEventListener("click", generateContent);
 
     if (checkConfig()) {
@@ -336,7 +313,6 @@
           return;
         }
       } catch (error) {
-        // Autorizado, mas falhou ao carregar o quadro: mostra o erro real em vez de pedir conexão de novo.
         if (error && /Erro do Trello|quadro/i.test(error.message)) {
           show($("#authPanel"), false);
           show($("#mainPanel"), true);

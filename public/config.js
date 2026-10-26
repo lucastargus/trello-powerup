@@ -4,25 +4,29 @@
  * APP_KEY: chave pública do Power-Up gerada no portal de desenvolvedor Trello.
  * Não coloque token pessoal do Trello neste arquivo.
  *
- * O Power-Up agora usa AUTOMATICAMENTE o quadro onde o botão foi clicado,
- * então não é mais necessário informar IDs de quadros.
+ * O Power-Up usa AUTOMATICAMENTE o quadro onde o botão foi clicado.
  */
 window.TARGUS_POWERUP_CONFIG = {
   appName: "Targus | Cronogramas de Marketing",
   appKey: "56eadaecd87c7e114cfae18fca0c494b",
 
   /*
-   * Áreas = LISTAS do quadro onde os cards serão criados.
-   * listName: nome da lista no Trello (maiúsculas/acentos não importam:
-   * "PROSPECCAO" encontra "Prospecção").
+   * Cada área corresponde a uma LISTA do quadro (o card sempre vai para ela)
+   * e define quais tipos de card podem ser criados nela.
+   * Maiúsculas e acentos não importam ("PROSPECCAO" encontra "Prospecção").
    */
   areas: {
-    instagram: { name: "Instagram", listName: "INSTAGRAM" },
-    prospeccao: { name: "Prospecção", listName: "PROSPECCAO" }
+    instagram: {
+      name: "Instagram",
+      listName: "INSTAGRAM",
+      types: ["POST", "VIDEO", "STORYS"]
+    },
+    prospeccao: {
+      name: "Prospecção",
+      listName: "PROSPECCAO",
+      types: ["SITE", "BLOG", "PROSPECÇÃO ATIVA"]
+    }
   },
-
-  /* Tipos de card (cada um vira uma etiqueta com o mesmo nome). */
-  cardTypes: ["POST", "VIDEO", "STORYS"],
 
   /*
    * Tipo de card -> etiqueta aplicada no cartão.
@@ -31,7 +35,10 @@ window.TARGUS_POWERUP_CONFIG = {
   labelsByType: {
     "POST": { name: "POST", color: "orange" },
     "VIDEO": { name: "VIDEO", color: "blue" },
-    "STORYS": { name: "STORYS", color: "purple" }
+    "STORYS": { name: "STORYS", color: "purple" },
+    "SITE": { name: "SITE", color: "green" },
+    "BLOG": { name: "BLOG", color: "yellow" },
+    "PROSPECÇÃO ATIVA": { name: "PROSPECÇÃO ATIVA", color: "red" }
   },
 
   contentCardsPerBatch: 4,

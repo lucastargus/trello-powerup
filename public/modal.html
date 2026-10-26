@@ -9,55 +9,41 @@
 <body>
   <main class="app-shell">
     <header class="page-header">
-      <img class="brand-logo" src="./assets/logo Black.png" alt="Targus" onerror="this.style.display='none'">
-      <div>
-        <h1>Criar cards</h1>
-        <p>Geração de cards de cronogramas no Trello.</p>
-      </div>
+      <svg class="header-icon" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><path d="M21 13V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8"/><path d="M3 10h18"/><path d="M16 19h6"/><path d="M19 16v6"/></svg>
+      <h1>Criar cards</h1>
+      <p>Geração de cards de cronogramas no Trello.</p>
     </header>
 
     <section id="setupNotice" class="notice notice-warning hidden"></section>
 
     <section id="authPanel" class="panel hidden">
       <h2>Conectar ao Trello</h2>
-      <p>Na primeira utilização, autorize o Power-Up a consultar listas e etiquetas e criar cards em seu nome.</p>
+      <p class="helper">Na primeira utilização, autorize o Power-Up a consultar listas e etiquetas e criar cards em seu nome.</p>
       <button id="connectButton" class="button button-primary" type="button">Conectar ao Trello</button>
       <p id="authError" class="error-text"></p>
     </section>
 
-    <section id="mainPanel" class="hidden">
-      <section id="contentTab" class="panel tab-panel">
-        <h2>1. Definir destino e tipo</h2>
-        <div class="form-grid">
-          <label>Área de destino
-            <select id="contentArea" required>
-              <option value="instagram">Instagram</option>
-              <option value="prospeccao">Prospecção</option>
-            </select>
-          </label>
-          <label>Tipo de card / etiqueta
-            <select id="contentType" required></select>
-          </label>
-          <label>Lista de destino no Trello
-            <select id="contentList" required></select>
-          </label>
-          <label>Responsável (opcional)
-            <select id="contentMember"><option value="">Sem responsável</option></select>
-          </label>
-        </div>
-        <p class="helper">O tipo selecionado (POST, VIDEO ou STORYS) define a etiqueta. A lista de destino começa na lista da área escolhida; você pode alterá-la se necessário.</p>
+    <section id="mainPanel" class="panel hidden">
+      <h2>Novo cronograma</h2>
+      <div class="form-grid">
+        <label>Área de destino
+          <select id="contentArea" required>
+            <option value="instagram">Instagram</option>
+            <option value="prospeccao">Prospecção</option>
+          </select>
+        </label>
+        <label>Tipo de Card
+          <select id="contentType" required></select>
+        </label>
+      </div>
 
-        <h2>2. Datas e temas</h2>
-        <p class="helper">Preencha até 4 cards. Informe a data planejada de publicação; o prazo do card será definido automaticamente para 3 dias antes, às 9h.</p>
-        <div id="contentRows" class="date-rows"></div>
-        <div class="action-row">
-          <span id="contentCount" class="helper">0 card(s) selecionado(s)</span>
-          <button id="generateContentButton" class="button button-primary" type="button">Gerar cards de conteúdo</button>
-        </div>
-        <div id="contentResult" class="result-box hidden" aria-live="polite"></div>
-      </section>
+      <p class="helper">Informe a data planejada de publicação (até 4 cards). O prazo do card será definido automaticamente para 3 dias antes, às 9h.</p>
+      <div id="contentRows" class="date-rows"></div>
+
+      <button id="generateContentButton" class="button button-primary button-full" type="button">Gerar cards</button>
+      <p id="contentCount" class="helper count">0 card(s) selecionado(s)</p>
+      <div id="contentResult" class="result-box hidden" aria-live="polite"></div>
     </section>
-    <footer>Projeto interno Targus · Confirme a lista de destino e teste com poucos cards antes de usar na equipe.</footer>
   </main>
 
   <script src="https://p.trellocdn.com/power-up.min.js"></script>
