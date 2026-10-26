@@ -8,7 +8,7 @@
  */
 window.TARGUS_POWERUP_CONFIG = {
   appName: "Targus | Cronogramas de Marketing",
-  appKey: "56eadaecd87c7e114cfae18fca0c494b",
+  appKey: "5a3b910856e8c9473a3b4b440e21c8bc",
 
   /*
    * Cada área corresponde a uma LISTA do quadro (o card sempre vai para ela)
